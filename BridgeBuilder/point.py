@@ -14,3 +14,6 @@ class Point:
 
     def add_neighbours(self, neighbours):
         self.neighbours.extend(neighbours)
+
+    def __str__(self):
+        return str(self.coordinate)
