@@ -10,3 +10,7 @@ class Point:
 
     def add_neighbour(self, neighbor):
         self.neighbours.append(neighbor)
+
+    def add_neighbours(self, neighbours):
+        for neighbour in neighbours:
+            self.neighbours.append(neighbour)
