@@ -25,7 +25,7 @@ class Bridge:
                     edge_index += 1
         self.sparse_matrix = [[]]
 
-    def generate_visualisation(self, member_weight=False, k=2, show_member_weights=False):
+    def generate_visualisation(self, member_weight=False, k=2, show_member_weights=False, fname=None, show_coordinates=True):
         # general setup
         force_values = self.solve_matrix(self.convert_points_into_matrix(), member_weight=member_weight, k=k)
         plt.axis('equal')
@@ -35,7 +35,8 @@ class Bridge:
             x = point.coordinate[0]
             y = point.coordinate[1]
             plt.scatter(x, y, c='black')
-            plt.text(x, y, str(point))
+            if show_coordinates:
+                plt.text(x, y, str(point))
             # draw load if there is one
             if point.load:
                 plt.arrow(x,
@@ -54,7 +55,7 @@ class Bridge:
                 plt.arrow(x,
                           y,
                           0,
-                          -point.member_weight/5,
+                          -point.member_weight/10,
                           length_includes_head=True,
                           head_width=0.05,
                           ec='grey',
@@ -104,7 +105,13 @@ class Bridge:
                           head_width=0.05,
                           ec='green',
                           fc='green')
-        plt.show()
+
+        if fname:
+            plt.savefig(fname)
+            plt.cla()
+            plt.clf()
+        else:
+            plt.show()
 
     def solve_matrix(self, matrix, member_weight=False, k=2):
         """
