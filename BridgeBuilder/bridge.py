@@ -29,6 +29,7 @@ class Bridge:
         # general setup
         force_values = self.solve_matrix(self.convert_points_into_matrix(), member_weight=member_weight, k=k)
         plt.axis('equal')
+        plt.axis('off')
 
         # draw all points
         for point in self.points:
@@ -42,7 +43,7 @@ class Bridge:
                 plt.arrow(x,
                           y,
                           0,
-                          -point.load/2,
+                          -point.load/5,
                           length_includes_head=True,
                           head_width=0.05,
                           ec='blue',
@@ -55,7 +56,7 @@ class Bridge:
                 plt.arrow(x,
                           y,
                           0,
-                          -point.member_weight/10,
+                          -point.member_weight/15,
                           length_includes_head=True,
                           head_width=0.05,
                           ec='grey',
@@ -137,7 +138,7 @@ class Bridge:
         """
         assert k in [1, 2, 3], "The power used for calculating the member weight is not equal to 1, 2 or 3."
         if member_weight:
-            self.set_member_weights()
+            self.set_member_weights(k=k)
         else:
             self.reset_member_weights()
         # initialize "known forces" array
@@ -219,7 +220,7 @@ class Bridge:
         for key in self.edges.keys():
             p1 = list(key)[0]
             p2 = list(key)[1]
-            member_weight = distance.euclidean(p1.coordinate, p2.coordinate)
+            member_weight = distance.euclidean(p1.coordinate, p2.coordinate)**k
             p1.member_weight += member_weight
             p2.member_weight += member_weight
 
