@@ -2,13 +2,14 @@ from point import Point
 from scipy.spatial import distance
 from scipy.sparse.linalg import spsolve
 from scipy.sparse import csr_matrix
+from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 class Bridge:
 
-    def __init__(self, points):
+    def __init__(self, points, ground_level=0):
         """
         :param points: list of point objects.
         """
@@ -23,9 +24,9 @@ class Bridge:
                 if key not in self.edges:
                     self.edges[key] = edge_index
                     edge_index += 1
-        self.sparse_matrix = [[]]
+        self.ground_level = ground_level
 
-    def generate_visualisation(self, member_weight=False, k=2, show_member_weights=False, fname=None, show_coordinates=True):
+    def generate_visualisation(self, member_weight=False, k=1, show_member_weights=False, fname=None, show_coordinates=True):
         # general setup
         force_values = self.solve_matrix(self.convert_points_into_matrix(), member_weight=member_weight, k=k)
         plt.axis('equal')
@@ -114,7 +115,7 @@ class Bridge:
         else:
             plt.show()
 
-    def solve_matrix(self, matrix, member_weight=False, k=2):
+    def solve_matrix(self, matrix, member_weight=False, k=1):
         """
         :param matrix: system of linear equations representing the bridge.
         :param member_weight: boolean, if True the result will account for the weight of members.
@@ -213,7 +214,7 @@ class Bridge:
         for point in self.points:
             point.member_weight = 0
 
-    def set_member_weights(self, k=2):
+    def set_member_weights(self, k=1):
         assert k in [1, 2, 3], "The power used for calculating the member weight is not equal to 1, 2 or 3."
         self.reset_member_weights()
         # calculate new weights
@@ -223,6 +224,30 @@ class Bridge:
             member_weight = distance.euclidean(p1.coordinate, p2.coordinate)**k
             p1.member_weight += member_weight
             p2.member_weight += member_weight
+
+    def calculate_total_forces(self, new_coordinates, *args):
+        k = args[0][0]
+        new_co_index = 0
+        for point in self.points:
+            if point.coordinate[1] is not self.ground_level:
+                point.coordinate = (new_coordinates[new_co_index], new_coordinates[new_co_index+1])
+                new_co_index += 2
+        self.set_member_weights()
+        return sum(self.solve_matrix(self.convert_points_into_matrix(), member_weight=True, k=k)**2)
+
+    def optimize(self, k=1, show_member_weights=False, fname=None, show_coordinates=True):
+        variable_coordinates = []
+        for point in self.points:
+            if point.coordinate[1] is not self.ground_level:
+                variable_coordinates.append(point.coordinate[0])
+                variable_coordinates.append(point.coordinate[1])
+        solution = minimize(self.calculate_total_forces, np.array(variable_coordinates), args=[k]).x
+        sol_index = 0
+        for point in self.points:
+            if point.coordinate[1] is not self.ground_level:
+                point.coordinate = (solution[sol_index], solution[sol_index+1])
+                sol_index += 2
+        self.generate_visualisation(member_weight=True, k=k, show_member_weights=show_member_weights, fname=fname, show_coordinates=show_coordinates)
 
 
 if __name__ == "__main__":
