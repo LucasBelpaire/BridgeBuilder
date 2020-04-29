@@ -18,4 +18,4 @@ class Point:
         self.neighbours.extend(neighbours)
 
     def __str__(self):
-        return str(self.coordinate)
+        return '(' + str(round(self.coordinate[0], 2)) + ', ' + str(round(self.coordinate[1], 2)) + ')'
