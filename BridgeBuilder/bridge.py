@@ -18,13 +18,19 @@ class Bridge:
         # two points will correspond with one edge, the edge is represented by an int (index)
         self.edges = {}
         edge_index = 0
+        number_of_forces = 0
         for point in self.points:
+            if not point.is_anchored_x:
+                number_of_forces += 1
+            if not point.is_anchored_y:
+                number_of_forces += 1
             for neighbour in point.neighbours:
                 key = frozenset([point, neighbour])
                 if key not in self.edges:
                     self.edges[key] = edge_index
                     edge_index += 1
         self.ground_level = ground_level
+        assert number_of_forces == len(self.edges.keys()), "There is no unique solution. The number of equations and unkown forces aren't equal."
 
     def generate_visualisation(self, member_weight=False, k=1, show_member_weights=False, fname=None, show_coordinates=True):
         # general setup
