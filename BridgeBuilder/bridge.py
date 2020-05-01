@@ -30,9 +30,11 @@ class Bridge:
                     self.edges[key] = edge_index
                     edge_index += 1
         self.ground_level = ground_level
-        assert number_of_forces == len(self.edges.keys()), "There is no unique solution. The number of equations and unkown forces aren't equal."
+        assert number_of_forces == len(
+            self.edges.keys()), "There is no unique solution. The number of equations and unknown forces aren't equal."
 
-    def generate_visualisation(self, member_weight=False, k=1, show_member_weights=False, fname=None, show_coordinates=True):
+    def generate_visualisation(self, member_weight=False, k=1, show_member_weights=False, fname=None,
+                               show_coordinates=True):
         # general setup
         force_values = self.solve_matrix(self.convert_points_into_matrix(), member_weight=member_weight, k=k)
         plt.axis('equal')
@@ -50,7 +52,7 @@ class Bridge:
                 plt.arrow(x,
                           y,
                           0,
-                          -point.load/5,
+                          -point.load / 5,
                           length_includes_head=True,
                           head_width=0.05,
                           ec='blue',
@@ -58,12 +60,12 @@ class Bridge:
             if point.member_weight:
                 if show_member_weights:
                     plt.text(x,
-                             y-0.2,
+                             y - 0.2,
                              str(round(point.member_weight, 3)))
                 plt.arrow(x,
                           y,
                           0,
-                          -point.member_weight/15,
+                          -point.member_weight / 15,
                           length_includes_head=True,
                           head_width=0.05,
                           ec='grey',
@@ -82,8 +84,8 @@ class Bridge:
             if force < 0:
                 plt.arrow(x_middle,
                           y_middle,
-                          (x1-x_middle),
-                          (y1-y_middle),
+                          (x1 - x_middle),
+                          (y1 - y_middle),
                           length_includes_head=True,
                           head_width=0.05,
                           ec='red',
@@ -202,7 +204,8 @@ class Bridge:
                 for neighbour in point.neighbours:
                     edge_key = frozenset([point, neighbour])
                     column_index = self.edges[edge_key]
-                    value = (neighbour.coordinate[0] - point.coordinate[0]) / distance.euclidean(point.coordinate, neighbour.coordinate)
+                    value = (neighbour.coordinate[0] - point.coordinate[0]) / distance.euclidean(point.coordinate,
+                                                                                                 neighbour.coordinate)
                     matrix[row_index][column_index] = value
                 row_index += 1
             # y-direction
@@ -210,7 +213,8 @@ class Bridge:
                 for neighbour in point.neighbours:
                     edge_key = frozenset([point, neighbour])
                     column_index = self.edges[edge_key]
-                    value = (neighbour.coordinate[1] - point.coordinate[1]) / distance.euclidean(point.coordinate, neighbour.coordinate)
+                    value = (neighbour.coordinate[1] - point.coordinate[1]) / distance.euclidean(point.coordinate,
+                                                                                                 neighbour.coordinate)
                     matrix[row_index][column_index] = value
                 row_index += 1
         return matrix
@@ -227,7 +231,7 @@ class Bridge:
         for key in self.edges.keys():
             p1 = list(key)[0]
             p2 = list(key)[1]
-            member_weight = distance.euclidean(p1.coordinate, p2.coordinate)**k
+            member_weight = distance.euclidean(p1.coordinate, p2.coordinate) ** k
             p1.member_weight += member_weight
             p2.member_weight += member_weight
 
@@ -236,10 +240,10 @@ class Bridge:
         new_co_index = 0
         for point in self.points:
             if point.coordinate[1] is not self.ground_level:
-                point.coordinate = (new_coordinates[new_co_index], new_coordinates[new_co_index+1])
+                point.coordinate = (new_coordinates[new_co_index], new_coordinates[new_co_index + 1])
                 new_co_index += 2
         self.set_member_weights()
-        return sum(self.solve_matrix(self.convert_points_into_matrix(), member_weight=True, k=k)**2)
+        return sum(self.solve_matrix(self.convert_points_into_matrix(), member_weight=True, k=k) ** 2)
 
     def optimize(self, k=1, show_member_weights=False, fname=None, show_coordinates=True):
         variable_coordinates = []
@@ -251,11 +255,13 @@ class Bridge:
         sol_index = 0
         for point in self.points:
             if point.coordinate[1] is not self.ground_level:
-                point.coordinate = (solution[sol_index], solution[sol_index+1])
+                point.coordinate = (solution[sol_index], solution[sol_index + 1])
                 sol_index += 2
-        self.generate_visualisation(member_weight=True, k=k, show_member_weights=show_member_weights, fname=fname, show_coordinates=show_coordinates)
+        self.generate_visualisation(member_weight=True, k=k, show_member_weights=show_member_weights, fname=fname,
+                                    show_coordinates=show_coordinates)
 
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
