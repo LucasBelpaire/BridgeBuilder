@@ -2,7 +2,7 @@ from point import Point
 from bridge import Bridge
 
 
-# Introduction bridge
+# Bridge A
 p0 = Point((0, 0), is_anchored_x=True, is_anchored_y=True)
 p1 = Point((1, 0), load=1)
 p2 = Point((2, 0), is_anchored_y=True)
@@ -14,17 +14,20 @@ p2.add_neighbours([p1, p4])
 p3.add_neighbours([p0, p1, p4])
 p4.add_neighbours([p3, p1, p2])
 b = Bridge([p0, p1, p2, p3, p4])
-b.generate_visualisation(fname="plots/introduction_bridge.png")
 
+# Visualize bridge
+b.generate_visualisation(fname="plots/introduction_bridge.png")
 
 # Bridge with weights
 # distance^1
-b.generate_visualisation(member_weight=True, k=1, fname="plots/introduction_bridge_k1.png")
+b.generate_visualisation(member_weight=True, k=1, show_member_weights=True, show_coordinates=False)
 # distance^2
-b.generate_visualisation(member_weight=True, k=2, fname="plots/introduction_bridge_k2.png")
+b.generate_visualisation(member_weight=True, k=2, show_member_weights=True, show_coordinates=False)
 # distance^3
-b.generate_visualisation(member_weight=True, k=3, fname="plots/introduction_bridge_k3.png")
+b.generate_visualisation(member_weight=True, k=3, show_member_weights=True, show_coordinates=False)
 
+# Optimize bridge
+b.optimize()
 
 # Micheal T. Heath: Scientific Computing [6, Chapter 2]
 p1 = Point((0, 0), is_anchored_x=True, is_anchored_y=True)
@@ -46,7 +49,8 @@ p7.add_neighbours([p4, p5, p6, p8])
 p8.add_neighbours([p6, p7])
 
 b2 = Bridge([p1, p2, p3, p4, p5, p6, p7, p8])
-b2.generate_visualisation(member_weight=True, fname="plots/heath_bridge.png")
+b2.generate_visualisation(member_weight=True)
+b2.optimize(fname="plots/optimized_heath_bridge_k3.png", k=3)
 
 # Long unique bridge: https://www.canambridges.com/products/steel-bridges/steel-standard-truss-bridges/
 points = []
@@ -88,3 +92,22 @@ points[len(points)-2].is_anchored_y = True
 
 long_bridge = Bridge(points)
 long_bridge.generate_visualisation(member_weight=True, show_coordinates=False)
+
+
+# crane
+p1 = Point((3, 0), is_anchored_x=True, is_anchored_y=True)
+p2 = Point((5, 0), is_anchored_y=True)
+p3 = Point((2, 10), is_anchored_y=True)
+p4 = Point((4, 10))
+p5 = Point((4, 13))
+p6 = Point((20, 10), load=30)
+
+p1.add_neighbours([p2, p4])
+p2.add_neighbours([p1, p4])
+p3.add_neighbours([p4, p5])
+p4.add_neighbours([p1, p2, p3, p5, p6])
+p5.add_neighbours([p3, p4, p6])
+p6.add_neighbours([p4, p5])
+
+crane = Bridge([p1, p2, p3, p4, p5, p6])
+crane.generate_visualisation(member_weight=True, fname="plots/crane_v2.png")
